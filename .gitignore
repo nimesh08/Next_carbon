@@ -1,0 +1,11 @@
+<<<<<<< HEAD
+node_modules
+.env
+=======
+node_modules/
+.env
+dist/
+>>>>>>> 94846d3136812b84df0d633aee53cc485b695bc0
+
+.env
+.env.local

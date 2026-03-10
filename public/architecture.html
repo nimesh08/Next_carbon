@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next Carbon - Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root { --bg:#0a0a0a; --surface:#141414; --border:#252525; --text:#e8e8e8; --muted:#888; --accent:#22c55e; --accent2:#3b82f6; --accent3:#a855f7; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;line-height:1.7}
+.container{max-width:1100px;margin:0 auto;padding:60px 30px}
+h1{font-family:'DM Serif Display',serif;font-size:3.2rem;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-family:'DM Serif Display',serif;font-size:2rem;margin:50px 0 20px;color:var(--text);border-bottom:2px solid var(--border);padding-bottom:10px}
+h3{font-size:1.2rem;font-weight:600;margin:25px 0 12px;color:var(--accent)}
+p,li{color:var(--muted);font-size:.95rem;font-weight:300}
+ul{padding-left:20px}
+li{margin:6px 0}
+.subtitle{font-size:1.15rem;color:var(--muted);margin-bottom:40px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin:16px 0}
+.card-title{font-weight:600;font-size:1.05rem;color:var(--text);margin-bottom:10px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge-green{background:#16a34a22;color:#22c55e;border:1px solid #22c55e44}
+.badge-blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.badge-purple{background:#a855f722;color:#c084fc;border:1px solid #a855f744}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:768px){.grid,.grid-3{grid-template-columns:1fr}h1{font-size:2.2rem}}
+.mermaid{background:#fff;border-radius:16px;padding:20px;margin:20px 0}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:.9rem}
+th{color:var(--accent);font-weight:600}
+td{color:var(--muted)}
+code{background:#1e1e1e;padding:2px 6px;border-radius:4px;font-size:.85rem;color:#22c55e}
+.flow-step{display:flex;align-items:flex-start;gap:16px;margin:12px 0}
+.flow-num{min-width:32px;height:32px;background:var(--accent);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+.flow-text{flex:1}
+.flow-text strong{color:var(--text)}
+.divider{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:40px 0}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Next Carbon</h1>
+<p class="subtitle">Three-Tier Carbon Credit Token Platform &mdash; Full Architecture Reference</p>
+
+<div class="card" style="border-color: var(--accent)">
+<div class="card-title">Live Access</div>
+<table>
+<tr><th>Component</th><th>URL</th></tr>
+<tr><td>Frontend</td><td><code>http://13.201.222.240:5173</code></td></tr>
+<tr><td>Backend API</td><td><code>http://13.201.222.240:3001</code></td></tr>
+<tr><td>Supabase</td><td><code>lssyupytzmpvzxisbgdr.supabase.co</code></td></tr>
+<tr><td>Blockchain</td><td>Polygon Amoy (Chain ID: 80002)</td></tr>
+</table>
+</div>
+
+<h2>1. Three-Component Architecture</h2>
+
+<div class="mermaid">
+graph TB
+    subgraph FE["Frontend - React + Vite"]
+        UI["Pages and Components"]
+        Auth["Supabase Auth"]
+        Razor["Razorpay SDK"]
+    end
+    subgraph BE["Backend - Express.js"]
+        API["REST API - 15+ endpoints"]
+        Ethers["ethers.js v6"]
+        SB["Supabase Service Client"]
+    end
+    subgraph BC["Polygon Amoy Blockchain"]
+        Factory["ProjectTokenFactory"]
+        PT["ProjectToken x5"]
+        Pool["CreditPool"]
+        SEC["SECToken"]
+        ACC["ActualCreditToken"]
+        CM["CreditManager"]
+    end
+    subgraph DB["Supabase"]
+        PG["PostgreSQL - 10 tables"]
+        AuthSvc["Auth Service"]
+        Storage["Storage Buckets"]
+        RT["Realtime Subscriptions"]
+    end
+    UI --> API
+    UI --> Auth
+    UI --> Razor
+    API --> Ethers
+    API --> SB
+    Ethers --> Factory
+    Ethers --> PT
+    Ethers --> Pool
+    Ethers --> CM
+    SB --> PG
+    Auth --> AuthSvc
+    UI -.-> RT
+</div>
+
+<div class="grid-3">
+<div class="card"><div class="card-title"><span class="badge badge-blue">Frontend</span></div><ul>
+<li>React 18 + Vite + TypeScript</li><li>Tailwind CSS + shadcn/ui + Radix</li><li>Leaflet maps (free)</li><li>Razorpay payment</li><li>Supabase Auth + Realtime</li><li>14 pages / routes</li></ul></div>
+<div class="card"><div class="card-title"><span class="badge badge-green">Backend</span></div><ul>
+<li>Express.js + TypeScript</li><li>ethers.js v6 (all 6 contracts)</li><li>Supabase service role</li><li>Razorpay verify</li><li>8 route groups, 15+ endpoints</li><li>multer file uploads</li></ul></div>
+<div class="card"><div class="card-title"><span class="badge badge-purple">Smart Contracts</span></div><ul>
+<li>Solidity 0.8.24 + OpenZeppelin v5</li><li>6 contracts on Polygon Amoy</li><li>Hardhat + 13 tests</li><li>Factory pattern</li><li>ERC-20 all tokens</li><li>Custodial wallet model</li></ul></div>
+</div>
+
+<h2>2. Smart Contract Architecture</h2>
+
+<div class="mermaid">
+graph LR
+    subgraph ownership["Owner: Company Wallet"]
+        Factory["ProjectTokenFactory"]
+    end
+    subgraph tokens["ERC-20 Tokens"]
+        RTP1["CEARR - Brazil Biomass"]
+        RTP2["VICHA - Colombia Forest"]
+        RTP3["GHANA - Ecosystem"]
+        RTP4["HONDU - Hydroelectric"]
+        RTP5["SUNDA - Mangrove"]
+        SECTok["SECToken - Index"]
+        ACCTok["ActualCreditToken"]
+    end
+    subgraph logic["Business Logic"]
+        CPool["CreditPool"]
+        CMgr["CreditManager"]
+    end
+    Factory -->|deploys| RTP1
+    Factory -->|deploys| RTP2
+    Factory -->|deploys| RTP3
+    Factory -->|deploys| RTP4
+    Factory -->|deploys| RTP5
+    RTP1 -->|deposit| CPool
+    RTP2 -->|deposit| CPool
+    CPool -->|mints weighted| SECTok
+    CMgr -->|"burns RTP (partial)"| RTP1
+    CMgr -->|mints| ACCTok
+    CMgr -->|"offset burns"| ACCTok
+    CMgr -->|controls| CPool
+</div>
+
+<table>
+<tr><th>Contract</th><th>Address (Amoy)</th><th>Purpose</th></tr>
+<tr><td><code>ProjectTokenFactory</code></td><td><code>0x28A1CbC05EeEDA6585C6372307d5B162eaA19A5a</code></td><td>Deploys one ERC-20 per project</td></tr>
+<tr><td><code>CreditManager</code></td><td><code>0x26C2E12FB742861C4FC2eb4068240BeD0FB8497B</code></td><td>Orchestrator: mature, offset, mint</td></tr>
+<tr><td><code>CreditPool</code></td><td><code>0x58f1F17d583161E9faC559078056f391A450FBB9</code></td><td>Deposit RTP, get weighted SEC</td></tr>
+<tr><td><code>SECToken</code></td><td><code>0x758B5f7fe7EFB3c9C18CCC2269A2d6728A3Eb763</code></td><td>Pooled index token</td></tr>
+<tr><td><code>ActualCreditToken</code></td><td><code>0x70274D7F4B6a5fcF1Fb9514498cC5bC0d8e0EDa7</code></td><td>Verified carbon credit (ACC)</td></tr>
+<tr><td><code>CEARR</code></td><td><code>0xD7d4B5f07c0Ff35189B6301FCd4E3e7EA3cAD538</code></td><td>Ceara Biomass RTP</td></tr>
+<tr><td><code>VICHA</code></td><td><code>0x7A76e45dDE02c83F93f0163411E89236b34331B9</code></td><td>Vichada Reforestation RTP</td></tr>
+<tr><td><code>GHANA</code></td><td><code>0xa0327B8810E1dc4718B0a2679e9F70c1Aa9D64Eb</code></td><td>Ghana Ecosystem RTP</td></tr>
+<tr><td><code>HONDU</code></td><td><code>0x149b909eE81d123DA4E9AC1771d4234b532F0907</code></td><td>Honduras Hydro RTP</td></tr>
+<tr><td><code>SUNDA</code></td><td><code>0xafdB58Dd5edD5eb10fA0331aA76C693449a4bEF4</code></td><td>Sundarbans Mangrove RTP</td></tr>
+</table>
+
+<h2>3. Token Lifecycle</h2>
+
+<div class="mermaid">
+stateDiagram-v2
+    [*] --> Purchase: User pays via Razorpay
+    Purchase --> RTP_Minted: Mint ProjectToken on-chain
+    RTP_Minted --> Pooled: Deposit to CreditPool
+    Pooled --> SEC_Held: Receive weighted SEC tokens
+    RTP_Minted --> PartialMature: Admin triggers X% yearly
+    PartialMature --> ACC_Partial: Burn RTP + Mint ACC
+    ACC_Partial --> PartialMature: Next year cycle
+    ACC_Partial --> ACC_Full: 100% matured
+    SEC_Held --> ACC_Claimed: Claim after maturity
+    ACC_Full --> Offset: Retire credits
+    ACC_Claimed --> Offset: Retire credits
+    Offset --> Burned: Permanent removal
+    Burned --> [*]
+    RTP_Minted --> Redeemed: Withdraw to wallet
+    ACC_Full --> Redeemed: Withdraw to wallet
+</div>
+
+<h3>Phase 1: Purchase (RTP Minting)</h3>
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User pays via Razorpay</strong> &mdash; INR payment for shares of a carbon project</div></div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Backend verifies payment</strong> &mdash; Razorpay signature check</div></div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.mint(companyWallet, shares)</code> &mdash; RTP minted</div></div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>DB:</strong> user_token_balances RTP += shares</div></div>
+
+<h3>Phase 2: Pool (Optional)</h3>
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CreditPool.deposit(tokenAddr, amount)</code> &mdash; RTP to pool, SEC minted (amount * weight)</div></div>
+
+<h3>Phase 3: Partial Yearly Maturity</h3>
+<div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Admin triggers X%</strong> &mdash; e.g. 20% per year for 5 years</div></div>
+<div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.burnFrom(companyWallet, partialAmt)</code></div></div>
+<div class="flow-step"><div class="flow-num">8</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CreditManager.mintAcc(companyWallet, partialAmt)</code></div></div>
+<div class="flow-step"><div class="flow-num">9</div><div class="flow-text"><strong>DB:</strong> Each user RTP reduced, ACC increased proportionally</div></div>
+
+<h3>Phase 4: Offset / Retirement</h3>
+<div class="flow-step"><div class="flow-num">10</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CreditManager.offset(holder, amount)</code> &mdash; ACC burned forever</div></div>
+<div class="flow-step"><div class="flow-num">11</div><div class="flow-text"><strong>PDF retirement certificate</strong> generated with tx hash</div></div>
+
+<h3>Phase 5: Redeem to Wallet</h3>
+<div class="flow-step"><div class="flow-num">12</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.transfer(userWallet, amount)</code> &mdash; real ERC-20 transfer</div></div>
+
+<h2>4. Product Lifecycle (User Journey)</h2>
+
+<div class="mermaid">
+graph TD
+    A["Sign Up"] --> B["Complete KYC"]
+    B --> C{"Admin Approves?"}
+    C -->|Yes| D["Browse Projects"]
+    C -->|No| B
+    D --> E["Buy Shares via Razorpay"]
+    E --> F["RTP Tokens Minted"]
+    F --> G{"What to do?"}
+    G --> H["Hold in Portfolio"]
+    G --> I["Deposit to Pool"]
+    G --> J["Redeem to Wallet"]
+    I --> K["Receive SEC Tokens"]
+    H --> L{"Admin Matures X%"}
+    L --> M["RTP converted to ACC"]
+    M --> L
+    M --> N{"100% Matured?"}
+    N -->|Yes| O["Full ACC Balance"]
+    K --> P["Claim ACC from Pool"]
+    O --> Q{"Offset or Trade?"}
+    P --> Q
+    Q --> R["Retire ACC on-chain"]
+    R --> S["PDF Certificate"]
+    Q --> T["Redeem ACC to Wallet"]
+</div>
+
+<div class="grid">
+<div class="card"><div class="card-title">User Actions</div><ul>
+<li><strong>Sign Up</strong> &rarr; Supabase Auth</li>
+<li><strong>KYC</strong> &rarr; Upload doc, admin approves</li>
+<li><strong>Buy Shares</strong> &rarr; Razorpay + RTP mint</li>
+<li><strong>View Portfolio</strong> &rarr; Shares + map + tokens</li>
+<li><strong>Pool Tokens</strong> &rarr; RTP to SEC</li>
+<li><strong>Offset</strong> &rarr; Burn ACC permanently</li>
+<li><strong>Redeem</strong> &rarr; Tokens to personal wallet</li></ul></div>
+<div class="card"><div class="card-title">Admin Actions</div><ul>
+<li><strong>Create Project</strong> &rarr; Deploys ERC-20</li>
+<li><strong>Manage Projects</strong> &rarr; Update details</li>
+<li><strong>Approve KYC</strong> &rarr; Review documents</li>
+<li><strong>Partial Maturity</strong> &rarr; Yearly burn+mint</li>
+<li><strong>Monitor Users</strong> &rarr; All users + KYC</li></ul></div>
+</div>
+
+<h2>5. All API Endpoints</h2>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>On-Chain?</th><th>Function</th></tr>
+<tr><td>POST</td><td><code>/api/orders/create</code></td><td></td><td>Create Razorpay order</td></tr>
+<tr><td>POST</td><td><code>/api/orders/verify</code></td><td>YES</td><td>Verify payment + mint RTP</td></tr>
+<tr><td>GET</td><td><code>/api/property</code></td><td></td><td>List all projects</td></tr>
+<tr><td>POST</td><td><code>/api/property</code></td><td>YES</td><td>Create project + deploy ERC-20</td></tr>
+<tr><td>POST</td><td><code>/api/offset</code></td><td>YES</td><td>Burn ACC credits</td></tr>
+<tr><td>POST</td><td><code>/api/tokens/redeem</code></td><td>YES</td><td>Transfer to user wallet</td></tr>
+<tr><td>GET</td><td><code>/api/tokens/balances/:id</code></td><td></td><td>Get token balances</td></tr>
+<tr><td>POST</td><td><code>/api/pool/deposit</code></td><td>YES</td><td>Deposit RTP for SEC</td></tr>
+<tr><td>POST</td><td><code>/api/pool/withdraw</code></td><td>YES</td><td>Burn SEC, reclaim tokens</td></tr>
+<tr><td>POST</td><td><code>/api/pool/claim</code></td><td>YES</td><td>Exchange SEC for ACC</td></tr>
+<tr><td>POST</td><td><code>/api/admin/mature/:id</code></td><td>YES</td><td>Partial maturity (burn+mint)</td></tr>
+<tr><td>GET</td><td><code>/api/admin/projects-maturity</code></td><td></td><td>Maturity status</td></tr>
+<tr><td>GET</td><td><code>/api/admin/maturity-history/:id</code></td><td></td><td>Maturity event log</td></tr>
+<tr><td>POST</td><td><code>/api/upload/kyc</code></td><td></td><td>Upload KYC document</td></tr>
+<tr><td>POST</td><td><code>/api/kyc/submit</code></td><td></td><td>Submit KYC form</td></tr>
+</table>
+
+<div class="divider"></div>
+<p style="text-align:center;color:var(--muted);font-size:.8rem">Next Carbon &copy; 2026 &mdash; React + Express + Solidity + Supabase + Polygon Amoy</p>
+</div>
+
+<script>mermaid.initialize({theme:'default',securityLevel:'loose'});</script>
+</body>
+</html>
