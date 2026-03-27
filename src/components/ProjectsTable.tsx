@@ -21,8 +21,7 @@ import { SearchIcon } from "./custom/dashboard/icons/SearchIcon";
 import { ChevronUpIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Project } from "index";
-import axios from "axios";
-import { toast } from "sonner";
+// axios and toast available if needed
 
 const columns = [
     { uid: "cover", name: "" },

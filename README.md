@@ -1,50 +1,117 @@
-# React + TypeScript + Vite
+# Next Carbon - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based carbon credit tokenization platform frontend built with Vite, TypeScript, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** + **Vite 6** + **TypeScript 5.7**
+- **Tailwind CSS** + **shadcn/ui** + **Radix UI**
+- **Zustand** for state management
+- **Leaflet** for interactive maps
+- **NextUI** for data tables
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- User authentication (Supabase Auth)
+- Project dashboard with carbon credit listings
+- Token portfolio management (PT, CIT, VCC)
+- Credit pool deposit/withdraw/claim
+- Offset/retire credits with NFT certificates
+- Admin panel for maturity management
+- KYC verification flow
 
-- Configure the top-level `parserOptions` property like this:
+## Environment Variables
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Create a `.env` file:
+
+```env
+VITE_SUPABASE_URI=https://your-project.supabase.co
+VITE_SUPABASE_ANON=your-anon-key
+VITE_BACKEND_URL=http://your-server-ip:3001
+VITE_RAZORPAY_KEY=rzp_test_xxxxx
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Development
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm install
+npm run dev
 ```
+
+## Production Build
+
+```bash
+npm run build
+```
+
+Output will be in `dist/` folder.
+
+## Deployment Guide
+
+### Option 1: Nginx (Recommended)
+
+1. Build the frontend:
+   ```bash
+   npm run build
+   ```
+
+2. Install nginx:
+   ```bash
+   sudo apt install nginx
+   ```
+
+3. Create nginx config `/etc/nginx/sites-available/nextcarbon`:
+   ```nginx
+   server {
+       listen 80;
+       server_name _;
+
+       root /path/to/Next_carbon/dist;
+       index index.html;
+
+       location / {
+           try_files $uri $uri/ /index.html;
+       }
+
+       location /api/ {
+           proxy_pass http://127.0.0.1:3001;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+4. Enable and restart:
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/nextcarbon /etc/nginx/sites-enabled/
+   sudo rm /etc/nginx/sites-enabled/default
+   sudo nginx -t && sudo systemctl restart nginx
+   ```
+
+### Option 2: Vercel
+
+1. Connect your GitHub repo to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy
+
+## Project Structure
+
+```
+src/
+├── components/       # UI components
+│   ├── custom/       # Custom components (dashboard, sidebar)
+│   └── ui/           # shadcn/ui components
+├── pages/            # Route pages
+├── Admin/            # Admin panel components
+├── hooks/            # Custom React hooks
+├── lib/              # Utilities (supabase client)
+├── state-management/ # Zustand stores
+└── types/            # TypeScript types
+```
+
+## License
+
+MIT
