@@ -12,6 +12,7 @@
   import Portfolio from "./components/custom/dashboard/pages/Portfolio";
   import TokenPortfolio from "./components/custom/dashboard/pages/TokenPortfolio";
   import Pool from "./components/custom/dashboard/pages/Pool";
+import CertificateGallery from "./components/CertificateGallery";
   import CreditPurchasePage from "./pages/offset";
   import Transaction_History from "./components/custom/dashboard/pages/Transaction_History";
   import ProjectStatus from "./pages/project.status";
@@ -105,6 +106,16 @@ import MaturityManagement from "./Admin/MaturityManagement";
               <AuthMiddleware>
                 <Dashboard>
                   <Pool />
+                </Dashboard>
+              </AuthMiddleware>
+            }
+          />
+          <Route
+            path="/dashboard/certificates"
+            element={
+              <AuthMiddleware>
+                <Dashboard>
+                  <CertificateGallery />
                 </Dashboard>
               </AuthMiddleware>
             }

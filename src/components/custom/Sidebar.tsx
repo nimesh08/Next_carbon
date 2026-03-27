@@ -6,6 +6,7 @@ import {
   faRightLeft,
   faWallet,
   faWater,
+  faCertificate,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -44,6 +45,7 @@ const Sidebar = () => {
     { name: "Credit Pool", icon: faWater, path: "/dashboard/pool" },
     { name: "Transaction History", icon: faRightLeft, path: "/dashboard/history" },
     { name: "Offset", icon: faCoins, path: "/offset" },
+    { name: "Certificates", icon: faCertificate, path: "/dashboard/certificates" },
   ];
 
   const handleMenuClick = (item: any) => {
@@ -53,6 +55,7 @@ const Sidebar = () => {
       "/dashboard/pool",
       "/dashboard/history",
       "/offset",
+      "/dashboard/certificates",
     ];
 
     if (kycRequired.includes(item.path)) {

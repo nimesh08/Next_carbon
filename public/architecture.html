@@ -38,6 +38,12 @@ code{background:#1e1e1e;padding:2px 6px;border-radius:4px;font-size:.85rem;color
 .flow-text{flex:1}
 .flow-text strong{color:var(--text)}
 .divider{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:40px 0}
+.token-legend{display:flex;gap:20px;flex-wrap:wrap;margin:20px 0}
+.token-item{display:flex;align-items:center;gap:8px}
+.token-dot{width:12px;height:12px;border-radius:50%}
+.token-dot.pt{background:#22c55e}
+.token-dot.cit{background:#3b82f6}
+.token-dot.vcc{background:#a855f7}
 </style>
 </head>
 <body>
@@ -57,6 +63,15 @@ code{background:#1e1e1e;padding:2px 6px;border-radius:4px;font-size:.85rem;color
 </table>
 </div>
 
+<div class="card">
+<div class="card-title">Token Naming Convention</div>
+<div class="token-legend">
+<div class="token-item"><div class="token-dot pt"></div><strong>Project Token (PT)</strong> &mdash; Fractional ownership in a carbon project</div>
+<div class="token-item"><div class="token-dot cit"></div><strong>Carbon Index Token (CIT)</strong> &mdash; Diversified basket from pool</div>
+<div class="token-item"><div class="token-dot vcc"></div><strong>Verified Carbon Credit (VCC)</strong> &mdash; Real verified credit for retirement</div>
+</div>
+</div>
+
 <h2>1. Three-Component Architecture</h2>
 
 <div class="mermaid">
@@ -72,12 +87,12 @@ graph TB
         SB["Supabase Service Client"]
     end
     subgraph BC["Polygon Amoy Blockchain"]
-        Factory["ProjectTokenFactory"]
-        PT["ProjectToken x5"]
-        Pool["CreditPool"]
-        SEC["SECToken"]
-        ACC["ActualCreditToken"]
-        CM["CreditManager"]
+        Factory["Token Deployer"]
+        PT["Project Token x5"]
+        Pool["Diversification Pool"]
+        CIT["Carbon Index Token"]
+        VCC["Verified Carbon Credit"]
+        CM["Carbon Lifecycle Manager"]
     end
     subgraph DB["Supabase"]
         PG["PostgreSQL - 10 tables"]
@@ -113,47 +128,47 @@ graph TB
 <div class="mermaid">
 graph LR
     subgraph ownership["Owner: Company Wallet"]
-        Factory["ProjectTokenFactory"]
+        Factory["Token Deployer"]
     end
     subgraph tokens["ERC-20 Tokens"]
-        RTP1["CEARR - Brazil Biomass"]
-        RTP2["VICHA - Colombia Forest"]
-        RTP3["GHANA - Ecosystem"]
-        RTP4["HONDU - Hydroelectric"]
-        RTP5["SUNDA - Mangrove"]
-        SECTok["SECToken - Index"]
-        ACCTok["ActualCreditToken"]
+        PT1["CEARR - Brazil Biomass"]
+        PT2["VICHA - Colombia Forest"]
+        PT3["GHANA - Ecosystem"]
+        PT4["HONDU - Hydroelectric"]
+        PT5["SUNDA - Mangrove"]
+        CITTok["Carbon Index Token"]
+        VCCTok["Verified Carbon Credit"]
     end
     subgraph logic["Business Logic"]
-        CPool["CreditPool"]
-        CMgr["CreditManager"]
+        CPool["Diversification Pool"]
+        CMgr["Carbon Lifecycle Manager"]
     end
-    Factory -->|deploys| RTP1
-    Factory -->|deploys| RTP2
-    Factory -->|deploys| RTP3
-    Factory -->|deploys| RTP4
-    Factory -->|deploys| RTP5
-    RTP1 -->|deposit| CPool
-    RTP2 -->|deposit| CPool
-    CPool -->|mints weighted| SECTok
-    CMgr -->|"burns RTP (partial)"| RTP1
-    CMgr -->|mints| ACCTok
-    CMgr -->|"offset burns"| ACCTok
+    Factory -->|deploys| PT1
+    Factory -->|deploys| PT2
+    Factory -->|deploys| PT3
+    Factory -->|deploys| PT4
+    Factory -->|deploys| PT5
+    PT1 -->|deposit| CPool
+    PT2 -->|deposit| CPool
+    CPool -->|mints weighted| CITTok
+    CMgr -->|"burns PT (partial)"| PT1
+    CMgr -->|mints| VCCTok
+    CMgr -->|"offset burns"| VCCTok
     CMgr -->|controls| CPool
 </div>
 
 <table>
-<tr><th>Contract</th><th>Address (Amoy)</th><th>Purpose</th></tr>
-<tr><td><code>ProjectTokenFactory</code></td><td><code>0x28A1CbC05EeEDA6585C6372307d5B162eaA19A5a</code></td><td>Deploys one ERC-20 per project</td></tr>
-<tr><td><code>CreditManager</code></td><td><code>0x26C2E12FB742861C4FC2eb4068240BeD0FB8497B</code></td><td>Orchestrator: mature, offset, mint</td></tr>
-<tr><td><code>CreditPool</code></td><td><code>0x58f1F17d583161E9faC559078056f391A450FBB9</code></td><td>Deposit RTP, get weighted SEC</td></tr>
-<tr><td><code>SECToken</code></td><td><code>0x758B5f7fe7EFB3c9C18CCC2269A2d6728A3Eb763</code></td><td>Pooled index token</td></tr>
-<tr><td><code>ActualCreditToken</code></td><td><code>0x70274D7F4B6a5fcF1Fb9514498cC5bC0d8e0EDa7</code></td><td>Verified carbon credit (ACC)</td></tr>
-<tr><td><code>CEARR</code></td><td><code>0xD7d4B5f07c0Ff35189B6301FCd4E3e7EA3cAD538</code></td><td>Ceara Biomass RTP</td></tr>
-<tr><td><code>VICHA</code></td><td><code>0x7A76e45dDE02c83F93f0163411E89236b34331B9</code></td><td>Vichada Reforestation RTP</td></tr>
-<tr><td><code>GHANA</code></td><td><code>0xa0327B8810E1dc4718B0a2679e9F70c1Aa9D64Eb</code></td><td>Ghana Ecosystem RTP</td></tr>
-<tr><td><code>HONDU</code></td><td><code>0x149b909eE81d123DA4E9AC1771d4234b532F0907</code></td><td>Honduras Hydro RTP</td></tr>
-<tr><td><code>SUNDA</code></td><td><code>0xafdB58Dd5edD5eb10fA0331aA76C693449a4bEF4</code></td><td>Sundarbans Mangrove RTP</td></tr>
+<tr><th>Contract</th><th>Display Name</th><th>Address (Amoy)</th><th>Purpose</th></tr>
+<tr><td><code>ProjectTokenFactory</code></td><td>Token Deployer</td><td><code>0x28A1CbC05EeEDA6585C6372307d5B162eaA19A5a</code></td><td>Deploys one ERC-20 per project</td></tr>
+<tr><td><code>CreditManager</code></td><td>Carbon Lifecycle Manager</td><td><code>0x26C2E12FB742861C4FC2eb4068240BeD0FB8497B</code></td><td>Orchestrator: mature, offset, mint</td></tr>
+<tr><td><code>CreditPool</code></td><td>Diversification Pool</td><td><code>0x58f1F17d583161E9faC559078056f391A450FBB9</code></td><td>Deposit PT, get weighted CIT</td></tr>
+<tr><td><code>SECToken</code></td><td>Carbon Index Token (CIT)</td><td><code>0x758B5f7fe7EFB3c9C18CCC2269A2d6728A3Eb763</code></td><td>Pooled index token</td></tr>
+<tr><td><code>ActualCreditToken</code></td><td>Verified Carbon Credit (VCC)</td><td><code>0x70274D7F4B6a5fcF1Fb9514498cC5bC0d8e0EDa7</code></td><td>Real verified carbon credit</td></tr>
+<tr><td><code>CEARR</code></td><td>Brazil Biomass (PT)</td><td><code>0xD7d4B5f07c0Ff35189B6301FCd4E3e7EA3cAD538</code></td><td>Ceara Biomass Project Token</td></tr>
+<tr><td><code>VICHA</code></td><td>Colombia Forest (PT)</td><td><code>0x7A76e45dDE02c83F93f0163411E89236b34331B9</code></td><td>Vichada Reforestation Project Token</td></tr>
+<tr><td><code>GHANA</code></td><td>Ghana Ecosystem (PT)</td><td><code>0xa0327B8810E1dc4718B0a2679e9F70c1Aa9D64Eb</code></td><td>Ghana Ecosystem Project Token</td></tr>
+<tr><td><code>HONDU</code></td><td>Honduras Hydro (PT)</td><td><code>0x149b909eE81d123DA4E9AC1771d4234b532F0907</code></td><td>Honduras Hydroelectric Project Token</td></tr>
+<tr><td><code>SUNDA</code></td><td>India Mangrove (PT)</td><td><code>0xafdB58Dd5edD5eb10fA0331aA76C693449a4bEF4</code></td><td>Sundarbans Mangrove Project Token</td></tr>
 </table>
 
 <h2>3. Token Lifecycle</h2>
@@ -161,42 +176,42 @@ graph LR
 <div class="mermaid">
 stateDiagram-v2
     [*] --> Purchase: User pays via Razorpay
-    Purchase --> RTP_Minted: Mint ProjectToken on-chain
-    RTP_Minted --> Pooled: Deposit to CreditPool
-    Pooled --> SEC_Held: Receive weighted SEC tokens
-    RTP_Minted --> PartialMature: Admin triggers X% yearly
-    PartialMature --> ACC_Partial: Burn RTP + Mint ACC
-    ACC_Partial --> PartialMature: Next year cycle
-    ACC_Partial --> ACC_Full: 100% matured
-    SEC_Held --> ACC_Claimed: Claim after maturity
-    ACC_Full --> Offset: Retire credits
-    ACC_Claimed --> Offset: Retire credits
+    Purchase --> PT_Minted: Mint Project Token on-chain
+    PT_Minted --> Pooled: Deposit to Diversification Pool
+    Pooled --> CIT_Held: Receive weighted CIT tokens
+    PT_Minted --> PartialMature: Admin triggers X% yearly
+    PartialMature --> VCC_Partial: Burn PT + Mint VCC
+    VCC_Partial --> PartialMature: Next year cycle
+    VCC_Partial --> VCC_Full: 100% matured
+    CIT_Held --> VCC_Claimed: Claim after maturity
+    VCC_Full --> Offset: Retire credits
+    VCC_Claimed --> Offset: Retire credits
     Offset --> Burned: Permanent removal
     Burned --> [*]
-    RTP_Minted --> Redeemed: Withdraw to wallet
-    ACC_Full --> Redeemed: Withdraw to wallet
+    PT_Minted --> Redeemed: Withdraw to wallet
+    VCC_Full --> Redeemed: Withdraw to wallet
 </div>
 
-<h3>Phase 1: Purchase (RTP Minting)</h3>
+<h3>Phase 1: Purchase (Project Token Minting)</h3>
 <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User pays via Razorpay</strong> &mdash; INR payment for shares of a carbon project</div></div>
 <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Backend verifies payment</strong> &mdash; Razorpay signature check</div></div>
-<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.mint(companyWallet, shares)</code> &mdash; RTP minted</div></div>
-<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>DB:</strong> user_token_balances RTP += shares</div></div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.mint(companyWallet, shares)</code> &mdash; PT minted</div></div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>DB:</strong> user_token_balances PT += shares</div></div>
 
-<h3>Phase 2: Pool (Optional)</h3>
-<div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CreditPool.deposit(tokenAddr, amount)</code> &mdash; RTP to pool, SEC minted (amount * weight)</div></div>
+<h3>Phase 2: Diversification Pool (Optional)</h3>
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>DiversificationPool.deposit(tokenAddr, amount)</code> &mdash; PT to pool, CIT minted (amount × weight)</div></div>
 
 <h3>Phase 3: Partial Yearly Maturity</h3>
 <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Admin triggers X%</strong> &mdash; e.g. 20% per year for 5 years</div></div>
 <div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.burnFrom(companyWallet, partialAmt)</code></div></div>
-<div class="flow-step"><div class="flow-num">8</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CreditManager.mintAcc(companyWallet, partialAmt)</code></div></div>
-<div class="flow-step"><div class="flow-num">9</div><div class="flow-text"><strong>DB:</strong> Each user RTP reduced, ACC increased proportionally</div></div>
+<div class="flow-step"><div class="flow-num">8</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CarbonLifecycleManager.mintVcc(companyWallet, partialAmt)</code></div></div>
+<div class="flow-step"><div class="flow-num">9</div><div class="flow-text"><strong>DB:</strong> Each user PT reduced, VCC increased proportionally</div></div>
 
-<h3>Phase 4: Offset / Retirement</h3>
-<div class="flow-step"><div class="flow-num">10</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CreditManager.offset(holder, amount)</code> &mdash; ACC burned forever</div></div>
+<h3>Phase 4: Carbon Offset / Retirement</h3>
+<div class="flow-step"><div class="flow-num">10</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>CarbonLifecycleManager.offset(holder, amount)</code> &mdash; VCC burned forever</div></div>
 <div class="flow-step"><div class="flow-num">11</div><div class="flow-text"><strong>PDF retirement certificate</strong> generated with tx hash</div></div>
 
-<h3>Phase 5: Redeem to Wallet</h3>
+<h3>Phase 5: Redeem to Personal Wallet</h3>
 <div class="flow-step"><div class="flow-num">12</div><div class="flow-text"><strong>ON-CHAIN:</strong> <code>ProjectToken.transfer(userWallet, amount)</code> &mdash; real ERC-20 transfer</div></div>
 
 <h2>4. Product Lifecycle (User Journey)</h2>
@@ -208,39 +223,39 @@ graph TD
     C -->|Yes| D["Browse Projects"]
     C -->|No| B
     D --> E["Buy Shares via Razorpay"]
-    E --> F["RTP Tokens Minted"]
+    E --> F["Project Tokens Minted"]
     F --> G{"What to do?"}
     G --> H["Hold in Portfolio"]
     G --> I["Deposit to Pool"]
     G --> J["Redeem to Wallet"]
-    I --> K["Receive SEC Tokens"]
+    I --> K["Receive CIT Tokens"]
     H --> L{"Admin Matures X%"}
-    L --> M["RTP converted to ACC"]
+    L --> M["PT converted to VCC"]
     M --> L
     M --> N{"100% Matured?"}
-    N -->|Yes| O["Full ACC Balance"]
-    K --> P["Claim ACC from Pool"]
+    N -->|Yes| O["Full VCC Balance"]
+    K --> P["Claim VCC from Pool"]
     O --> Q{"Offset or Trade?"}
     P --> Q
-    Q --> R["Retire ACC on-chain"]
+    Q --> R["Retire VCC on-chain"]
     R --> S["PDF Certificate"]
-    Q --> T["Redeem ACC to Wallet"]
+    Q --> T["Redeem VCC to Wallet"]
 </div>
 
 <div class="grid">
 <div class="card"><div class="card-title">User Actions</div><ul>
 <li><strong>Sign Up</strong> &rarr; Supabase Auth</li>
 <li><strong>KYC</strong> &rarr; Upload doc, admin approves</li>
-<li><strong>Buy Shares</strong> &rarr; Razorpay + RTP mint</li>
+<li><strong>Buy Shares</strong> &rarr; Razorpay + PT mint</li>
 <li><strong>View Portfolio</strong> &rarr; Shares + map + tokens</li>
-<li><strong>Pool Tokens</strong> &rarr; RTP to SEC</li>
-<li><strong>Offset</strong> &rarr; Burn ACC permanently</li>
+<li><strong>Pool Tokens</strong> &rarr; PT to CIT</li>
+<li><strong>Offset</strong> &rarr; Burn VCC permanently</li>
 <li><strong>Redeem</strong> &rarr; Tokens to personal wallet</li></ul></div>
 <div class="card"><div class="card-title">Admin Actions</div><ul>
-<li><strong>Create Project</strong> &rarr; Deploys ERC-20</li>
+<li><strong>Create Project</strong> &rarr; Deploys ERC-20 PT</li>
 <li><strong>Manage Projects</strong> &rarr; Update details</li>
 <li><strong>Approve KYC</strong> &rarr; Review documents</li>
-<li><strong>Partial Maturity</strong> &rarr; Yearly burn+mint</li>
+<li><strong>Partial Maturity</strong> &rarr; Yearly burn PT + mint VCC</li>
 <li><strong>Monitor Users</strong> &rarr; All users + KYC</li></ul></div>
 </div>
 
@@ -248,21 +263,37 @@ graph TD
 <table>
 <tr><th>Method</th><th>Endpoint</th><th>On-Chain?</th><th>Function</th></tr>
 <tr><td>POST</td><td><code>/api/orders/create</code></td><td></td><td>Create Razorpay order</td></tr>
-<tr><td>POST</td><td><code>/api/orders/verify</code></td><td>YES</td><td>Verify payment + mint RTP</td></tr>
+<tr><td>POST</td><td><code>/api/orders/verify</code></td><td>YES</td><td>Verify payment + mint PT</td></tr>
 <tr><td>GET</td><td><code>/api/property</code></td><td></td><td>List all projects</td></tr>
 <tr><td>POST</td><td><code>/api/property</code></td><td>YES</td><td>Create project + deploy ERC-20</td></tr>
-<tr><td>POST</td><td><code>/api/offset</code></td><td>YES</td><td>Burn ACC credits</td></tr>
+<tr><td>POST</td><td><code>/api/offset</code></td><td>YES</td><td>Burn VCC credits</td></tr>
 <tr><td>POST</td><td><code>/api/tokens/redeem</code></td><td>YES</td><td>Transfer to user wallet</td></tr>
 <tr><td>GET</td><td><code>/api/tokens/balances/:id</code></td><td></td><td>Get token balances</td></tr>
-<tr><td>POST</td><td><code>/api/pool/deposit</code></td><td>YES</td><td>Deposit RTP for SEC</td></tr>
-<tr><td>POST</td><td><code>/api/pool/withdraw</code></td><td>YES</td><td>Burn SEC, reclaim tokens</td></tr>
-<tr><td>POST</td><td><code>/api/pool/claim</code></td><td>YES</td><td>Exchange SEC for ACC</td></tr>
-<tr><td>POST</td><td><code>/api/admin/mature/:id</code></td><td>YES</td><td>Partial maturity (burn+mint)</td></tr>
+<tr><td>POST</td><td><code>/api/pool/deposit</code></td><td>YES</td><td>Deposit PT for CIT</td></tr>
+<tr><td>POST</td><td><code>/api/pool/withdraw</code></td><td>YES</td><td>Burn CIT, reclaim tokens</td></tr>
+<tr><td>POST</td><td><code>/api/pool/claim</code></td><td>YES</td><td>Exchange CIT for VCC</td></tr>
+<tr><td>POST</td><td><code>/api/admin/mature/:id</code></td><td>YES</td><td>Partial maturity (burn PT + mint VCC)</td></tr>
 <tr><td>GET</td><td><code>/api/admin/projects-maturity</code></td><td></td><td>Maturity status</td></tr>
 <tr><td>GET</td><td><code>/api/admin/maturity-history/:id</code></td><td></td><td>Maturity event log</td></tr>
 <tr><td>POST</td><td><code>/api/upload/kyc</code></td><td></td><td>Upload KYC document</td></tr>
 <tr><td>POST</td><td><code>/api/kyc/submit</code></td><td></td><td>Submit KYC form</td></tr>
 </table>
+
+<h2>6. Token Summary</h2>
+<div class="grid-3">
+<div class="card" style="border-color: #22c55e">
+<div class="card-title"><span class="badge badge-green">Project Token (PT)</span></div>
+<p>Represents fractional ownership in a specific carbon project. Each project has its own unique ERC-20 token (e.g., CEARR for Brazil Biomass). Minted when users purchase shares. Can be deposited to pool or held until maturity.</p>
+</div>
+<div class="card" style="border-color: #3b82f6">
+<div class="card-title"><span class="badge badge-blue">Carbon Index Token (CIT)</span></div>
+<p>Represents diversified exposure across multiple projects. Received when depositing PT to the Diversification Pool. Amount received = PT × project weight. Can be withdrawn for proportional PT or claimed for VCC after maturity.</p>
+</div>
+<div class="card" style="border-color: #a855f7">
+<div class="card-title"><span class="badge badge-purple">Verified Carbon Credit (VCC)</span></div>
+<p>Represents real, verified carbon credits. Created through yearly partial maturity (PT → VCC conversion). Can be retired (burned) for carbon offsetting with PDF certificate, or redeemed to personal wallet.</p>
+</div>
+</div>
 
 <div class="divider"></div>
 <p style="text-align:center;color:var(--muted);font-size:.8rem">Next Carbon &copy; 2026 &mdash; React + Express + Solidity + Supabase + Polygon Amoy</p>

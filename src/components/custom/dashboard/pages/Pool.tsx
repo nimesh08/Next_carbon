@@ -20,27 +20,27 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 
-interface RtpBalance {
+interface PtBalance {
   id: string;
   property_id: string;
   balance: number;
-  property_data: { name: string; weight: number; token_address: string | null };
+  property_data: { name: string; token_address: string | null };
 }
 
 interface PoolDeposit {
   id: string;
   property_id: string;
   amount: number;
-  sec_received: number;
+  cit_received: number;
   created_at: string;
   withdrawn: boolean;
 }
 
 function Pool() {
   const { user } = useAuth();
-  const [rtpBalances, setRtpBalances] = useState<RtpBalance[]>([]);
+  const [ptBalances, setPtBalances] = useState<PtBalance[]>([]);
   const [deposits, setDeposits] = useState<PoolDeposit[]>([]);
-  const [secTotal, setSecTotal] = useState(0);
+  const [citTotal, setCitTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const [depositProjectId, setDepositProjectId] = useState("");
@@ -56,21 +56,21 @@ function Pool() {
   }, [user?.id]);
 
   async function fetchData() {
-    const { data: rtp } = await supabase
+    const { data: pt } = await supabase
       .from("user_token_balances")
-      .select("*, property_data(name, weight, token_address)")
+      .select("*, property_data(name, token_address)")
       .eq("user_id", user!.id)
-      .eq("token_type", "RTP");
+      .eq("token_type", "PT");
 
-    if (rtp) setRtpBalances(rtp as RtpBalance[]);
+    if (pt) setPtBalances(pt as PtBalance[]);
 
-    const { data: sec } = await supabase
+    const { data: cit } = await supabase
       .from("user_token_balances")
       .select("balance")
       .eq("user_id", user!.id)
-      .eq("token_type", "SEC");
+      .eq("token_type", "CIT");
 
-    setSecTotal((sec ?? []).reduce((s, b) => s + b.balance, 0));
+    setCitTotal((cit ?? []).reduce((s: number, b: any) => s + b.balance, 0));
 
     const { data: deps } = await supabase
       .from("pool_deposits")
@@ -110,7 +110,7 @@ function Pool() {
     try {
       const { data } = await axios.post(`${BACKEND}/api/pool/withdraw`, {
         userId: user!.id,
-        secAmount: parseFloat(withdrawAmount),
+        citAmount: parseFloat(withdrawAmount),
       });
       if (data.success) {
         toast.success(data.message);
@@ -132,7 +132,7 @@ function Pool() {
     try {
       const { data } = await axios.post(`${BACKEND}/api/pool/claim`, {
         userId: user!.id,
-        secAmount: parseFloat(claimAmount),
+        citAmount: parseFloat(claimAmount),
       });
       if (data.success) {
         toast.success(data.message);
@@ -153,31 +153,30 @@ function Pool() {
       <div className="text-left">
         <h2 className="text-2xl font-bold">Carbon Credit Pool</h2>
         <p className="text-gray-500">
-          Deposit project tokens (RTP) to receive diversified SEC index tokens
+          Deposit Project Tokens (PT) to receive diversified CIT index tokens
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">{secTotal.toFixed(2)}</CardTitle>
-            <CardDescription>Your SEC Token Balance</CardDescription>
+            <CardTitle className="text-3xl">{citTotal.toFixed(2)}</CardTitle>
+            <CardDescription>Your CIT Balance</CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">{rtpBalances.length}</CardTitle>
-            <CardDescription>Projects with RTP tokens</CardDescription>
+            <CardTitle className="text-3xl">{ptBalances.length}</CardTitle>
+            <CardDescription>Projects with PT tokens</CardDescription>
           </CardHeader>
         </Card>
       </div>
 
-      {/* Deposit */}
       <Card>
         <CardHeader>
-          <CardTitle>Deposit RTP to Pool</CardTitle>
+          <CardTitle>Deposit PT to Pool</CardTitle>
           <CardDescription>
-            Select a project and amount of RTP tokens to deposit
+            Select a project and amount of PT tokens to deposit. You receive 1:1 CIT.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -186,9 +185,9 @@ function Pool() {
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
             <SelectContent>
-              {rtpBalances.map((b) => (
+              {ptBalances.map((b) => (
                 <SelectItem key={b.property_id} value={b.property_id}>
-                  {b.property_data?.name} ({b.balance.toFixed(2)} RTP, weight: {b.property_data?.weight}x)
+                  {b.property_data?.name} ({b.balance.toFixed(2)} PT)
                 </SelectItem>
               ))}
             </SelectContent>
@@ -205,16 +204,15 @@ function Pool() {
         </CardContent>
       </Card>
 
-      {/* Withdraw */}
       <Card>
         <CardHeader>
           <CardTitle>Withdraw from Pool</CardTitle>
-          <CardDescription>Burn SEC tokens to reclaim proportional project tokens</CardDescription>
+          <CardDescription>Burn CIT tokens to reclaim proportional project tokens</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input
             type="number"
-            placeholder={`SEC to burn (max: ${secTotal.toFixed(2)})`}
+            placeholder={`CIT to burn (max: ${citTotal.toFixed(2)})`}
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
           />
@@ -224,28 +222,26 @@ function Pool() {
         </CardContent>
       </Card>
 
-      {/* Claim ACC */}
       <Card>
         <CardHeader>
-          <CardTitle>Claim Actual Credits (ACC)</CardTitle>
+          <CardTitle>Claim VCC (First-Come-First-Serve)</CardTitle>
           <CardDescription>
-            After project maturity, burn SEC to claim your share of ACC tokens
+            After project maturity, burn CIT to claim VCC tokens. 1 CIT = 1 VCC, only if VCC is available in pool.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input
             type="number"
-            placeholder={`SEC to exchange for ACC (max: ${secTotal.toFixed(2)})`}
+            placeholder={`CIT to exchange for VCC (max: ${citTotal.toFixed(2)})`}
             value={claimAmount}
             onChange={(e) => setClaimAmount(e.target.value)}
           />
           <Button onClick={handleClaim} disabled={loading} className="w-full" variant="secondary">
-            {loading ? "Processing..." : "Claim ACC"}
+            {loading ? "Processing..." : "Claim VCC"}
           </Button>
         </CardContent>
       </Card>
 
-      {/* Deposit History */}
       {deposits.length > 0 && (
         <Card>
           <CardHeader>
@@ -257,8 +253,8 @@ function Pool() {
                 <thead>
                   <tr className="border-b">
                     <th className="pb-3 font-medium text-gray-600">Date</th>
-                    <th className="pb-3 font-medium text-gray-600 text-right">RTP Deposited</th>
-                    <th className="pb-3 font-medium text-gray-600 text-right">SEC Received</th>
+                    <th className="pb-3 font-medium text-gray-600 text-right">PT Deposited</th>
+                    <th className="pb-3 font-medium text-gray-600 text-right">CIT Received</th>
                     <th className="pb-3 font-medium text-gray-600 text-right">Status</th>
                   </tr>
                 </thead>
@@ -267,7 +263,7 @@ function Pool() {
                     <tr key={d.id} className="border-b last:border-0">
                       <td className="py-3">{new Date(d.created_at).toLocaleDateString()}</td>
                       <td className="py-3 text-right">{d.amount}</td>
-                      <td className="py-3 text-right">{d.sec_received}</td>
+                      <td className="py-3 text-right">{d.cit_received}</td>
                       <td className="py-3 text-right">
                         {d.withdrawn ? (
                           <span className="text-gray-400">Withdrawn</span>

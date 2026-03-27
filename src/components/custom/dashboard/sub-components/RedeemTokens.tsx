@@ -24,7 +24,7 @@ import axios from "axios";
 interface TokenBalance {
   id: string;
   property_id: string;
-  token_type: "RTP" | "SEC" | "ACC";
+  token_type: "PT" | "CIT" | "VCC";
   balance: number;
   property_data: { name: string };
 }

@@ -15,7 +15,7 @@ interface TokenBalance {
   id: string;
   user_id: string;
   property_id: string;
-  token_type: "RTP" | "SEC" | "ACC";
+  token_type: "PT" | "CIT" | "VCC";
   balance: number;
   updated_at: string;
   property_data: {
@@ -26,15 +26,15 @@ interface TokenBalance {
 }
 
 const tokenColors: Record<string, string> = {
-  RTP: "bg-blue-100 text-blue-800",
-  SEC: "bg-purple-100 text-purple-800",
-  ACC: "bg-green-100 text-green-800",
+  PT: "bg-blue-100 text-blue-800",
+  CIT: "bg-purple-100 text-purple-800",
+  VCC: "bg-green-100 text-green-800",
 };
 
 const tokenLabels: Record<string, string> = {
-  RTP: "Right to Play",
-  SEC: "SEC Index",
-  ACC: "Actual Credit",
+  PT: "Project Token",
+  CIT: "Carbon Index Token",
+  VCC: "Verified Carbon Credit",
 };
 
 function TokenPortfolio() {
@@ -87,9 +87,8 @@ function TokenPortfolio() {
         <RedeemTokens onComplete={() => window.location.reload()} />
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {(["RTP", "SEC", "ACC"] as const).map((type) => (
+        {(["PT", "CIT", "VCC"] as const).map((type) => (
           <Card key={type}>
             <CardHeader className="pb-2">
               <CardDescription>{tokenLabels[type]}</CardDescription>
@@ -102,11 +101,10 @@ function TokenPortfolio() {
         ))}
       </div>
 
-      {/* Per-project breakdown */}
       {balances.length === 0 ? (
         <Card>
           <CardContent className="py-10 text-center text-gray-500">
-            No token balances yet. Purchase shares to receive RTP tokens.
+            No token balances yet. Purchase shares to receive PT tokens.
           </CardContent>
         </Card>
       ) : (

@@ -26,8 +26,9 @@ interface ProjectMaturity {
 interface MaturityEvent {
   id: string;
   property_id: string;
-  total_rtp_burned: number;
-  total_acc_minted: number;
+  percentage: number;
+  total_pt_burned: number;
+  total_vcc_minted: number;
   tx_hash: string;
   created_at: string;
 }
@@ -78,7 +79,7 @@ function MaturityManagement() {
       return;
     }
 
-    if (!confirm(`Mature ${percentage}% of "${project.name}"? This will convert RTP tokens to ACC for all holders.`)) {
+    if (!confirm(`Mature ${percentage}% of "${project.name}"? This will convert PT tokens to VCC for all holders.`)) {
       return;
     }
 
@@ -114,8 +115,8 @@ function MaturityManagement() {
       <div className="text-left">
         <h2 className="text-2xl font-bold">Maturity Management</h2>
         <p className="text-gray-500">
-          Partially mature projects each year. This converts RTP (Right-to-Play) tokens
-          into ACC (Actual Carbon Credit) tokens for all holders proportionally.
+          Partially mature projects each year. This converts PT (Project Tokens)
+          into VCC (Verified Carbon Credits) for all holders proportionally.
         </p>
       </div>
 
@@ -172,8 +173,8 @@ function MaturityManagement() {
                     />
                   </div>
                   <div className="flex justify-between text-xs text-gray-400 mt-1">
-                    <span>0% (RTP)</span>
-                    <span>100% (ACC)</span>
+                    <span>0% (PT)</span>
+                    <span>100% (VCC)</span>
                   </div>
                 </CardHeader>
 
@@ -221,7 +222,7 @@ function MaturityManagement() {
                     {isFullyMature && (
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
                         <p className="text-green-700 font-medium">
-                          This project is fully matured. All RTP tokens have been converted to ACC.
+                          This project is fully matured. All PT tokens have been converted to VCC.
                         </p>
                       </div>
                     )}
@@ -253,10 +254,10 @@ function MaturityManagement() {
                                 </div>
                                 <div className="text-right">
                                   <span className="text-red-500 mr-3">
-                                    -{event.total_rtp_burned.toFixed(2)} RTP
+                                    -{event.total_pt_burned.toFixed(2)} PT
                                   </span>
                                   <span className="text-green-600">
-                                    +{event.total_acc_minted.toFixed(2)} ACC
+                                    +{event.total_vcc_minted.toFixed(2)} VCC
                                   </span>
                                 </div>
                               </div>

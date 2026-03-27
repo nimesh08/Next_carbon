@@ -466,7 +466,7 @@ export default function CreditPurchasePage() {
 
                     <div className="font-medium">Date:</div>
                     <div className="break-words">
-                      {purchase.created_at.toLocaleString()}
+                      {new Date(purchase.created_at).toLocaleString()}
                     </div>
                   </div>
                   <Button
