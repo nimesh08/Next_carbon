@@ -36,14 +36,14 @@ import { format } from "date-fns";
 import { supabase } from "@/lib/supabase";
 import axios from "axios";
 
-// Update Project interface to match the database structure
 interface Project {
   id: number;
   created_at: string;
   user_id: string;
   property_id: string;
   credits: number;
-  name?: string; // This will store the project name from property_data
+  name?: string;
+  maturity_percentage?: number;
 }
 
 // Update Purchase interface to match the offset table structure
@@ -111,42 +111,54 @@ export default function CreditPurchasePage() {
     getCurrentUser();
   }, []);
 
-  // Fetch projects with property names
+  // Fetch VCC balances with property names and maturity
   useEffect(() => {
     const fetchProjects = async () => {
       if (!currentUserId) return;
 
       setLoading(true);
       try {
-        const { data: projectsData, error: projectsError } = await supabase
-          .from("owners")
+        const { data: vccData, error: vccError } = await supabase
+          .from("user_token_balances")
           .select("*")
-          .eq("user_id", currentUserId);
+          .eq("user_id", currentUserId)
+          .eq("token_type", "VCC")
+          .gt("balance", 0);
 
-        if (projectsError) throw projectsError;
+        if (vccError) throw vccError;
 
-        // Fetch property names for each project
+        if (!vccData || vccData.length === 0) {
+          setProjects([]);
+          setLoading(false);
+          return;
+        }
+
         const projectsWithNames = await Promise.all(
-          projectsData.map(async (project) => {
+          vccData.map(async (vcc) => {
             const { data: propertyData, error: propertyError } = await supabase
               .from("property_data")
-              .select("name")
-              .eq("id", project.property_id)
+              .select("name, maturity_percentage")
+              .eq("id", vcc.property_id)
               .single();
 
             if (propertyError) throw propertyError;
 
             return {
-              ...project,
+              id: vcc.id,
+              created_at: vcc.created_at,
+              user_id: vcc.user_id,
+              property_id: vcc.property_id,
+              credits: vcc.balance,
               name: propertyData.name,
+              maturity_percentage: propertyData.maturity_percentage ?? 0,
             };
           })
         );
 
         setProjects(projectsWithNames);
       } catch (error) {
-        toast.error("Failed to fetch projects");
-        throw new Error(`Failed to fetch projects: ${error}`);
+        toast.error("Failed to fetch VCC balances");
+        console.error("Failed to fetch VCC balances:", error);
       } finally {
         setLoading(false);
       }
@@ -240,28 +252,34 @@ export default function CreditPurchasePage() {
           setPurchases(newPurchases);
         }
 
-        // Refetch projects data
-        const { data: projectsData, error: projectsError } = await supabase
-          .from("owners")
+        // Refetch VCC balances
+        const { data: vccRefresh, error: vccRefreshError } = await supabase
+          .from("user_token_balances")
           .select("*")
-          .eq("user_id", currentUserId);
+          .eq("user_id", currentUserId)
+          .eq("token_type", "VCC")
+          .gt("balance", 0);
 
-        if (projectsError) throw projectsError;
+        if (vccRefreshError) throw vccRefreshError;
 
-        // Fetch property names for each project
         const projectsWithNames = await Promise.all(
-          projectsData.map(async (project) => {
+          (vccRefresh ?? []).map(async (vcc) => {
             const { data: propertyData, error: propertyError } = await supabase
               .from("property_data")
-              .select("name")
-              .eq("id", project.property_id)
+              .select("name, maturity_percentage")
+              .eq("id", vcc.property_id)
               .single();
 
             if (propertyError) throw propertyError;
 
             return {
-              ...project,
+              id: vcc.id,
+              created_at: vcc.created_at,
+              user_id: vcc.user_id,
+              property_id: vcc.property_id,
+              credits: vcc.balance,
               name: propertyData.name,
+              maturity_percentage: propertyData.maturity_percentage ?? 0,
             };
           })
         );
@@ -328,8 +346,8 @@ export default function CreditPurchasePage() {
                               key={project.property_id}
                               value={project.property_id.toString()}
                             >
-                              {project.name} ({project.credits} credits
-                              available)
+                              {project.name} ({project.credits} VCC
+                              {project.maturity_percentage !== undefined && ` · ${project.maturity_percentage}% mature`})
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -356,7 +374,7 @@ export default function CreditPurchasePage() {
                       </FormControl>
                       <FormDescription className="text-xs">
                         {selectedProject
-                          ? `Enter a number less than or equal to ${selectedProject.credits}.`
+                          ? `You have ${selectedProject.credits} VCC available to retire.`
                           : "Select a project first."}
                       </FormDescription>
                       <FormMessage />

@@ -35,16 +35,16 @@ function Home() {
         <div className="flex flex-col items-center md:items-start text-center md:text-left gap-y-5 w-full lg:w-[55rem]">
           {/* Text container */}
           <div className="flex flex-col items-center justify-center lg:items-start mt-5">
-            <div className="mb-3 text-3xl lg:text-3xl">
+            <div className="mb-3 text-xl sm:text-2xl lg:text-3xl">
               The New Age De-Fi Protocol for sustainability projects
             </div>
-            <div className="flex flex-col font-bold text-5xl gap-y-3 lg:text-[5rem]">
+            <div className="flex flex-col font-bold text-3xl sm:text-5xl gap-y-3 lg:text-[5rem]">
               <TextGenerateEffect words="Own Carbon Credit Tokens" />
             </div>
-            <div className="flex flex-col text-5xl font-bold gap-y-3 lg:text-[5rem]">
+            <div className="flex flex-col text-3xl sm:text-5xl font-bold gap-y-3 lg:text-[5rem]">
               <TextGenerateEffect words="Own the Sustainable Future" />
             </div>
-            <div className="mt-4 text-3xl lg:text-[3rem]">
+            <div className="mt-4 text-xl sm:text-3xl lg:text-[3rem]">
               <p className="lg:leading-[3.5rem] justify-center flex flex-col items-center lg:items-start">
                 <div className="flex flex-row items-center gap-x-3">
                   <WordRotate
@@ -117,7 +117,7 @@ function Home() {
               <CardBody className="relative group/card w-full sm:w-[30rem] h-auto rounded-xl">
                 <CardItem translateZ="100" className="w-full">
                   <div className="flex flex-row items-center justify-between w-full sm:w-[30rem] p-6 md:px-8 gap-x-4 md:gap-x-20 rounded-2xl bg-gamma">
-                    <div className="flex flex-row items-center gap-x-4 min-w-[70vw] lg:w-auto">
+                    <div className="flex flex-row items-center gap-x-4 w-full lg:w-auto">
                       <FontAwesomeIcon icon={item.icon} size="xl" />
                       <p className="text-md md:text-xl">{item.text}</p>
                     </div>

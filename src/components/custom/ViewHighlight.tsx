@@ -1,7 +1,9 @@
 import React from "react";
 
 interface Highlight {
-  highlight: string;
+  highlight?: string;
+  title?: string;
+  description?: string;
 }
 
 interface ViewHighlightProps {
@@ -10,23 +12,41 @@ interface ViewHighlightProps {
 
 const ViewHighlight: React.FC<ViewHighlightProps> = ({ highlights }) => {
   return (
-    <div className="grid grid-cols-2 mb-6 gap-x-4 gap-y-6">
-      {highlights.map((item, index) => (
-        <div
-          key={index}
-          className="flex flex-row bg-white border border-black rounded-xl"
-        >
-          {/* Vertical index bar */}
-          <div className="flex items-center justify-center p-0 m-0 bg-black rounded-tl-xl rounded-bl-xl w-[4.5rem]">
-            <p className="px-0 m-0 text-white transform -rotate-90 text-md font-bold tracking-wider">
-              {String(index + 1).padStart(2, "0")}
-            </p>
-          </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 mb-6 gap-3 sm:gap-x-4 sm:gap-y-5">
+      {highlights.map((item, index) => {
+        const hasRichData = item.title || item.description;
 
-          {/* Highlight text */}
-          <p className="p-6 text-lg text-black">{item.highlight}</p>
-        </div>
-      ))}
+        return (
+          <div
+            key={index}
+            className="flex flex-row bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center justify-center shrink-0 bg-black w-12 sm:w-14">
+              <p className="text-white transform -rotate-90 text-sm font-bold tracking-wider whitespace-nowrap">
+                {String(index + 1).padStart(2, "0")}
+              </p>
+            </div>
+            <div className="p-4 sm:p-5 flex flex-col gap-1">
+              {hasRichData ? (
+                <>
+                  <p className="text-sm sm:text-base font-semibold text-gray-900">
+                    {item.title}
+                  </p>
+                  {item.description && (
+                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                      {item.description}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm sm:text-base text-gray-800 leading-relaxed">
+                  {item.highlight || "—"}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

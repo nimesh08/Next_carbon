@@ -26,7 +26,7 @@ import KycForm from "./dashboard/sub-components/KycForm";
 import { useKyc } from "@/hooks/KycContext";
 
 const Sidebar = () => {
-  const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState("All Projects");
   // const [kycStatus, setKycStatus] = useState<boolean | null>(null); // null = not submitted, false = pending, true = verified
   const [showKycDialog, setShowKycDialog] = useState(false);
@@ -74,30 +74,40 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="left-0 z-20 relative h-full">
-      {isSideBarOpen ? (
-        <Button
-          variant="outline"
-          size="sm"
-          className="absolute top-1 -right-[31px] !size-8 rounded-l-none"
-          onClick={() => setIsSideBarOpen(!isSideBarOpen)}
-        >
-          <X />
-        </Button>
-      ) : (
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute top-1 -right-8 !size-8"
-          onClick={() => setIsSideBarOpen(!isSideBarOpen)}
-        >
-          <Menu />
-        </Button>
+    <>
+      {/* Mobile overlay */}
+      {isSideBarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
+          onClick={() => setIsSideBarOpen(false)}
+        />
       )}
 
-      <aside
-        className={`${isSideBarOpen ? "w-[16rem]" : "hidden"} h-full bg-gray-100 border-r border-gray-200 flex flex-col justify-between`}
-      >
+      <div className={`left-0 z-40 relative h-full ${isSideBarOpen ? '' : 'lg:relative'}`}>
+        {/* Toggle button - always visible */}
+        {isSideBarOpen ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="absolute top-1 -right-[31px] !size-8 rounded-l-none z-50"
+            onClick={() => setIsSideBarOpen(!isSideBarOpen)}
+          >
+            <X />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="icon"
+            className="fixed top-[4.5rem] left-2 !size-9 z-30 lg:absolute lg:top-1 lg:-right-8 lg:left-auto lg:fixed-none shadow-md"
+            onClick={() => setIsSideBarOpen(!isSideBarOpen)}
+          >
+            <Menu />
+          </Button>
+        )}
+
+        <aside
+          className={`${isSideBarOpen ? "w-[16rem] fixed lg:relative" : "hidden"} h-full bg-gray-100 border-r border-gray-200 flex flex-col justify-between z-40`}
+        >
         <div className="p-6">
           <Link
             to={"/"}
@@ -215,6 +225,7 @@ const Sidebar = () => {
       {/* KYC Form Dialog */}
       <KycForm open={showMainDialog} onOpenChange={setShowMainDialog} />
     </div>
+    </>
   );
 };
 

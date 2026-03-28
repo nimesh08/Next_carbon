@@ -161,7 +161,22 @@ const ProjectStatus = () => {
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="min-h-screen bg-gray-50 py-6">
+        <div className="max-w-[95%] sm:max-w-[90%] container mx-auto animate-pulse">
+          <div className="h-10 bg-gray-200 rounded-lg w-48 mb-4" />
+          <div className="h-8 bg-gray-200 rounded-lg w-64 mb-2" />
+          <div className="h-6 bg-gray-200 rounded w-96 mb-8" />
+          <div className="bg-white rounded-xl p-6 mb-8">
+            <div className="h-4 bg-gray-200 rounded w-full mb-3" />
+            <div className="h-3 bg-gray-200 rounded w-full" />
+            <div className="space-y-3 mt-6">
+              {[1,2,3,4].map(i => <div key={i} className="h-6 bg-gray-200 rounded" />)}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!data) {
@@ -183,7 +198,7 @@ const ProjectStatus = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-[90%] container mx-auto">
+      <div className="max-w-[95%] sm:max-w-[90%] container mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -195,11 +210,11 @@ const ProjectStatus = () => {
             Back to Project Details
           </Button>
 
-          <div className="flex items-start justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Project Status</h1>
-              <p className="text-xl text-gray-700 mb-2">{data.name}</p>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Project Status</h1>
+              <p className="text-lg sm:text-xl text-gray-700 mb-2">{data.name}</p>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600">
                 <span>{data.location}</span>
                 <span>•</span>
                 <span>{data.type}</span>
@@ -209,9 +224,9 @@ const ProjectStatus = () => {
                 </Badge>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <p className="text-medium text-gray-600">Current Price</p>
-              <p className="text-2xl font-bold text-green-600">${data.price}</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600">${data.price}</p>
               <p className="text-sm text-gray-600">{data.available_shares} shares available</p>
             </div>
           </div>

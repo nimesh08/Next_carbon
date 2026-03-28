@@ -107,44 +107,44 @@ function Portfolio() {
   }, [user]);
 
   return (
-    <div className="flex flex-col w-full max-w-full px-4 mx-auto">
-      <div className="flex flex-row space-x-6">
-        <div className="w-1/2">
+    <div className="flex flex-col w-full max-w-full px-0 sm:px-4 mx-auto">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="w-full lg:w-1/2">
           <div className="text-left">
             <p className="text-lg">Portfolio Stats</p>
           </div>
           <hr className="h-[2px] bg-black/5 my-2" />
-          <div className="grid grid-cols-2 gap-6 p-4 mb-6 text-center">
-            <div className="flex flex-col items-center justify-center py-10 px-6 bg-black/10 rounded-2xl min-w-0 max-w-full">
-              <p className="text-5xl font-bold text-black ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 p-2 sm:p-4 mb-6 text-center">
+            <div className="flex flex-col items-center justify-center py-6 sm:py-10 px-4 sm:px-6 bg-black/10 rounded-2xl min-w-0 max-w-full">
+              <p className="text-2xl sm:text-4xl lg:text-5xl font-bold text-black break-all">
                 ${metadata.totalCurrentPortfolioValue}
               </p>
-              <p className="text-2xl">Your Portfolio</p>
+              <p className="text-lg sm:text-2xl">Your Portfolio</p>
             </div>
 
-            <div className="flex flex-col items-center justify-center py-8 bg-black/10 rounded-2xl">
-              <p className="text-5xl font-bold text-black">
+            <div className="flex flex-col items-center justify-center py-6 sm:py-8 px-4 bg-black/10 rounded-2xl">
+              <p className="text-2xl sm:text-4xl lg:text-5xl font-bold text-black">
                 ${metadata.totalProfit}
               </p>
-              <p className="text-2xl">Total Profit</p>
+              <p className="text-lg sm:text-2xl">Total Profit</p>
             </div>
-            <div className="flex flex-col items-center justify-center py-10 bg-black/10 rounded-2xl">
-              <p className="text-5xl font-bold text-black">
+            <div className="flex flex-col items-center justify-center py-6 sm:py-10 px-4 bg-black/10 rounded-2xl">
+              <p className="text-2xl sm:text-4xl lg:text-5xl font-bold text-black">
                 {metadata.totalPropertiesHeld}
               </p>
-              <p className="text-2xl">Total Projects Owned</p>
+              <p className="text-lg sm:text-2xl">Total Projects Owned</p>
             </div>
-            <div className="flex flex-col items-center justify-center py-8 bg-black/10 rounded-2xl">
-              <p className="text-5xl font-bold text-black">
+            <div className="flex flex-col items-center justify-center py-6 sm:py-8 px-4 bg-black/10 rounded-2xl">
+              <p className="text-2xl sm:text-4xl lg:text-5xl font-bold text-black">
                 {metadata.totalSharesHeld}
               </p>
-              <p className="text-2xl">Total Shares Held</p>
+              <p className="text-lg sm:text-2xl">Total Shares Held</p>
             </div>
           </div>
 
           <div className="flex justify-center">
             <button
-              className="w-full py-3 mx-4 text-lg text-white bg-black border-2 border-black rounded-xl hover:bg-white hover:text-black"
+              className="w-full py-3 mx-0 sm:mx-4 text-lg text-white bg-black border-2 border-black rounded-xl hover:bg-white hover:text-black transition-colors"
               onClick={() => navigate("/dashboard")}
             >
               Invest More
@@ -153,7 +153,7 @@ function Portfolio() {
         </div>
 
         {/* Mapbox Component */}
-        <div className="w-1/2 h-[30rem] ">
+        <div className="w-full lg:w-1/2 h-[20rem] sm:h-[25rem] lg:h-[30rem]">
           <p className="text-lg">Locate your shares</p>
           <hr className="h-[2px] bg-black/5 my-2" />
           <Mapbox properties={projects} />
