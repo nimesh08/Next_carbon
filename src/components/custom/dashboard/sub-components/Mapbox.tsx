@@ -128,8 +128,8 @@ const Mapbox: React.FC<MapboxProps> = ({ properties }) => {
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png",
-      { subdomains: "abcd", maxZoom: 19 }
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      { subdomains: "abc", maxZoom: 19 }
     ).addTo(map);
 
     mapRef.current = map;
